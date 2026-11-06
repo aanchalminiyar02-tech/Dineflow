@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="confirmation card"><div class="success-icon">✓</div><p class="eyebrow">ORDER RECEIVED</p><h1>Thank you!</h1><p>Your order <b>#{{ order.id }}</b> has been sent to the restaurant.</p><span class="table-pill">TABLE {{ order.table_no }}</span>
+<div class="receipt">{% for item in items %}<div><span>{{ item.quantity }} × {{ item.item_name }}</span><b>₹{{ '%.2f'|format(item.quantity*item.unit_price) }}</b></div>{% endfor %}<hr><div><b>Total</b><b>₹{{ '%.2f'|format(order.total) }}</b></div></div>
+<h3>Order status: <span class="status {{ order.status|lower }}" id="status">{{ order.status }}</span></h3><p class="muted small">Keep this page open to see status changes.</p><a class="button secondary" href="/menu/{{ order.table_no }}">Back to menu</a></div>
+{% endblock %}
+{% block scripts %}
+<script>
+const socket=io(),id={{ order.id }};
+socket.on("order_updated",o=>{if(o.id===id)document.getElementById("status").textContent=o.status;});
+</script>
+{% endblock %}

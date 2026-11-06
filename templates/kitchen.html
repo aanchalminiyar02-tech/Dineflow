@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">KITCHEN DISPLAY</p><h1>Kitchen orders</h1><p>Prepare orders in the order they arrive.</p></div><span class="live-dot">● Live updates enabled</span></div>
+<div class="kitchen-grid" id="kitchen-grid">
+{% for order in orders %}
+<article class="ticket" id="ticket-{{ order.id }}"><div class="ticket-head"><b>Order #{{ order.id }}</b><span class="table-pill">TABLE {{ order.table_no }}</span></div><p class="muted">{{ order.created_at }}</p>
+<ul>{% for item in order_items[order.id] %}<li><b>{{ item.quantity }} ×</b> {{ item.item_name }}</li>{% endfor %}</ul>
+{% if order.customer_note %}<p class="note">Note: {{ order.customer_note }}</p>{% endif %}
+<div class="ticket-actions"><span class="status {{ order.status|lower }}">{{ order.status }}</span><select onchange="setStatus({{ order.id }},this.value)"><option value="">Update status</option><option>Accepted</option><option>Preparing</option><option>Ready</option><option>Completed</option></select></div></article>
+{% else %}<div class="card"><h3>No active orders</h3><p>New orders will appear here.</p></div>{% endfor %}
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const socket=io();
+function setStatus(id,status){if(!status)return;fetch(`/api/orders/${id}/status`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({status})}).then(r=>r.json()).then(d=>{if(d.error)alert(d.error);else location.reload();});}
+socket.on("new_order",()=>location.reload());
+socket.on("order_updated",o=>{const t=document.getElementById("ticket-"+o.id);if(t&&["Completed","Cancelled"].includes(o.status))t.remove();});
+</script>
+{% endblock %}

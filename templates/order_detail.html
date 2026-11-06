@@ -1,0 +1,6 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="card detail-card"><p class="eyebrow">ORDER DETAILS</p><h1>Order #{{ order.id }}</h1><p><b>Table:</b> {{ order.table_no }} · <b>Status:</b> {{ order.status }}</p><p><b>Placed:</b> {{ order.created_at }}</p>
+{% if order.customer_note %}<p><b>Customer note:</b> {{ order.customer_note }}</p>{% endif %}
+<table><thead><tr><th>Item</th><th>Quantity</th><th>Price</th><th>Subtotal</th></tr></thead><tbody>{% for item in items %}<tr><td>{{ item.item_name }}</td><td>{{ item.quantity }}</td><td>₹{{ '%.2f'|format(item.unit_price) }}</td><td>₹{{ '%.2f'|format(item.quantity*item.unit_price) }}</td></tr>{% endfor %}</tbody></table><h2 class="right">Total: ₹{{ '%.2f'|format(order.total) }}</h2><a href="/manager">← Back to dashboard</a></div>
+{% endblock %}

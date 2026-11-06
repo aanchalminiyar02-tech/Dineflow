@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}DineFlow Restaurant{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="/">🍽️ DineFlow</a>
+  <nav>
+    <a href="/">Home</a>
+    <a href="/manager">Manager</a>
+    <a href="/kitchen">Kitchen</a>
+    {% if session.get('manager_logged_in') %}<a href="/manager/qr">Table QR Codes</a><a href="/manager/logout">Logout</a>{% endif %}
+  </nav>
+</header>
+<main class="container">
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}<div class="flash {{ category }}">{{ message }}</div>{% endfor %}
+  {% endwith %}
+  {% block content %}{% endblock %}
+</main>
+<footer> DineFlow · QR-based restaurant ordering demo </footer>
+{% block scripts %}{% endblock %}
+</body></html>

@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+  <div><p class="eyebrow">SMART RESTAURANT ORDERING</p><h1>Scan. Order. Enjoy.</h1>
+  <p>Let guests order from their table while your team manages every order from one live dashboard.</p>
+  <a class="button" href="/manager/login">Open manager dashboard</a></div>
+  <div class="hero-card"><div class="plate">🍕</div><h3>Fresh food, less waiting</h3><p>Table-aware digital ordering</p></div>
+</section>
+<section class="grid three">
+  <article class="card"><h3>📱 Customer menu</h3><p>Scan a table QR code, browse the menu and place an order from a phone.</p><a href="/menu/1">Preview table 1 menu →</a></article>
+  <article class="card"><h3>🧾 Manager dashboard</h3><p>See table numbers, items, order totals and update order progress.</p><a href="/manager/login">Manager login →</a></article>
+  <article class="card"><h3>👨‍🍳 Kitchen screen</h3><p>Kitchen staff can see active tickets and mark them ready.</p><a href="/manager/login">Open kitchen →</a></article>
+</section>
+{% endblock %}
