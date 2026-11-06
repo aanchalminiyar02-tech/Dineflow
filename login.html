@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="login-wrap card"><p class="eyebrow">STAFF ACCESS</p><h1>Manager login</h1>
+<form method="post"><label>Username</label><input name="username" required autocomplete="username">
+<label>Password</label><input type="password" name="password" required autocomplete="current-password">
+<button class="button full">Login</button></form>
+<p class="small muted">Demo login: <b>admin</b> / <b>admin123</b>. Change credentials before deployment.</p></div>
+{% endblock %}

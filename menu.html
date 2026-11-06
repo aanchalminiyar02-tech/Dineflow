@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Menu · Table {{ table_no }}{% endblock %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">WELCOME TO DINEFLOW</p><h1>Our Menu</h1><p>You're ordering from <b>Table {{ table_no }}</b></p></div><span class="table-pill">TABLE {{ table_no }}</span></div>
+<div class="menu-layout">
+  <section><div class="category-row">
+    <button class="category active" data-category="All">All</button>
+    {% for category in items|map(attribute='category')|unique %}<button class="category" data-category="{{ category }}">{{ category }}</button>{% endfor %}
+  </div>
+  <div class="food-grid">
+  {% for item in items %}
+    <article class="food-card" data-category="{{ item.category }}">
+      <img src="{{ item.image_url or 'https://images.unsplash.com/photo-1547592180-85f173990554?w=600' }}" alt="{{ item.name }}" onerror="this.style.display='none'">
+      <div class="food-info"><span class="tag">{{ item.category }}</span><h3>{{ item.name }}</h3><p>{{ item.description }}</p>
+      <div class="food-bottom"><b>₹{{ '%.2f'|format(item.price) }}</b><button class="add-btn" onclick="addToCart({{ item.id }}, {{ item.name|tojson }}, {{ item.price }})">+ Add</button></div></div>
+    </article>
+  {% endfor %}
+  </div></section>
+  <aside class="cart card"><h2>Your order</h2><p class="muted">Table {{ table_no }}</p><div id="cart-items"><p class="muted">Your cart is empty.</p></div>
+    <label for="note">Special instructions</label><textarea id="note" rows="2" placeholder="Less spicy, no onion..."></textarea>
+    <div class="cart-total"><span>Total</span><strong id="cart-total">₹0.00</strong></div>
+    <button class="button full" id="place-order" onclick="placeOrder()">Place order</button>
+    <p class="small muted">You can review your order before submitting.</p>
+  </aside>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const TABLE_NO = {{ table_no }};
+let cart = [];
+function money(n){return "₹"+Number(n).toFixed(2)}
+function addToCart(id,name,price){
+  const found=cart.find(x=>x.id===id);
+  if(found) found.quantity++; else cart.push({id,name,price,quantity:1});
+  renderCart();
+}
+function changeQty(id,delta){
+  const item=cart.find(x=>x.id===id); if(!item)return;
+  item.quantity+=delta; if(item.quantity<=0)cart=cart.filter(x=>x.id!==id);
+  renderCart();
+}
+function renderCart(){
+  const box=document.getElementById("cart-items");
+  if(!cart.length){box.innerHTML='<p class="muted">Your cart is empty.</p>';}
+  else {box.innerHTML=cart.map(x=>`<div class="cart-line"><div><b>${escapeHtml(x.name)}</b><small>${money(x.price)} each</small></div><div class="qty"><button onclick="changeQty(${x.id},-1)">−</button><b>${x.quantity}</b><button onclick="changeQty(${x.id},1)">+</button></div></div>`).join("");}
+  document.getElementById("cart-total").textContent=money(cart.reduce((s,x)=>s+x.price*x.quantity,0));
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+document.querySelectorAll(".category").forEach(btn=>btn.addEventListener("click",()=>{
+  document.querySelectorAll(".category").forEach(b=>b.classList.remove("active"));btn.classList.add("active");
+  document.querySelectorAll(".food-card").forEach(card=>card.style.display=(btn.dataset.category==="All"||card.dataset.category===btn.dataset.category)?"":"none");
+}));
+async function placeOrder(){
+  if(!cart.length){alert("Please add at least one item.");return;}
+  const btn=document.getElementById("place-order");btn.disabled=true;btn.textContent="Placing order...";
+  try{
+    const res=await fetch("/api/orders",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({table_no:TABLE_NO,items:cart.map(x=>({id:x.id,quantity:x.quantity})),note:document.getElementById("note").value})});
+    const data=await res.json();if(!res.ok)throw new Error(data.error||"Could not place order.");
+    location.href="/order/"+data.order_id;
+  }catch(e){alert(e.message);btn.disabled=false;btn.textContent="Place order";}
+}
+</script>
+{% endblock %}

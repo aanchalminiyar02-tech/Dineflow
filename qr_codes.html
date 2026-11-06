@@ -1,0 +1,5 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="page-heading"><div><p class="eyebrow">PRINT & PLACE ON TABLES</p><h1>Table QR codes</h1><p>Each code opens the menu with its table number already selected.</p></div><button class="button" onclick="window.print()">Print QR codes</button></div>
+<div class="qr-grid">{% for code in codes %}<article class="qr-card"><h3>Table {{ code.table_no }}</h3><img src="{{ url_for('static',filename=code.filename) }}" alt="QR code for table {{ code.table_no }}"><p class="small">{{ code.url }}</p></article>{% endfor %}</div>
+{% endblock %}
